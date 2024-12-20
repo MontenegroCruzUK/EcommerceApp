@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1095420072536",
+    "project_id": "ecommerceapp-b9606",
+    "storage_bucket": "ecommerceapp-b9606.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1095420072536:android:75abd00a4ba738dfd5f02d",
+        "android_client_info": {
+          "package_name": "com.montenegro.ecommerceapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB83xWYGYFS57Z2YesmB-gDYgUHBou3r3s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
