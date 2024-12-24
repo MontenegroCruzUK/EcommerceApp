@@ -1,14 +1,18 @@
 package com.montenegro.ecommerceapp.activity
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,6 +25,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,10 +35,12 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
@@ -50,6 +57,7 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
 import com.montenegro.ecommerceapp.R
+import com.montenegro.ecommerceapp.model.CategoryModel
 import com.montenegro.ecommerceapp.model.SliderModel
 import com.montenegro.ecommerceapp.viewmodel.MainViewModel
 
@@ -68,13 +76,28 @@ class MainActivity : BaseActivity() {
 fun MainActivityScreen() {
   
   val viewModel = MainViewModel()
+  
   val banners = remember { mutableStateListOf<SliderModel>() }
   var showBannerLoading by remember { mutableStateOf(true) }
+  
+  val categories = remember { mutableStateListOf<CategoryModel>() }
+  var showCategoriesLoading by remember { mutableStateOf(true) }
+  
+  //Banner
   LaunchedEffect(Unit) {
     viewModel.loadBanner().observeForever {
       banners.clear()
       banners.addAll(it)
       showBannerLoading = false
+    }
+  }
+  
+  //Category
+  LaunchedEffect(Unit) {
+    viewModel.loadCategory().observeForever {
+      categories.clear()
+      categories.addAll(it)
+      showCategoriesLoading = false
     }
   }
   
@@ -146,8 +169,118 @@ fun MainActivityScreen() {
           Banners(banners)
         }
       }
+      //Category
+      item {
+        Text(
+          text = "Oficial Brand",
+          color = Color.Black,
+          fontSize = 18.sp,
+          fontWeight = FontWeight.Bold,
+          modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 24.dp)
+            .padding(horizontal = 16.dp)
+        )
+      }
+      item {
+        if (showCategoriesLoading) {
+          Box(
+            modifier = Modifier
+              .fillMaxWidth()
+              .height(50.dp),
+            contentAlignment = Alignment.Center
+          ) {
+            CircularProgressIndicator()
+          }
+        } else {
+          //SectionTitle("Most Popular","See All")
+          CategoryList(categories)
+        }
+      }
       
     }
+  }
+  
+}
+
+@Composable
+fun CategoryList(categories: SnapshotStateList<CategoryModel>) {
+  var selectedIndex by remember { mutableStateOf(-1) }
+  val contex = LocalContext.current
+  LazyRow(
+    modifier = Modifier
+      .fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(24.dp),
+    contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp)
+  ) {
+    items(categories.size) { index ->
+      CategoryItem(
+        item = categories[index], isSelected = selectedIndex == index,
+        onItemClick = {
+          selectedIndex = index
+          Handler(Looper.getMainLooper()).postDelayed({
+          
+          }, 500)
+        }
+      )
+    }
+  }
+}
+
+
+@Composable
+fun CategoryItem(item: CategoryModel, isSelected: Boolean, onItemClick: () -> Unit) {
+  Column(
+    modifier = Modifier
+      .clickable(onClick = onItemClick), horizontalAlignment = Alignment.CenterHorizontally
+  ) {
+    AsyncImage(
+      model = (item.picUrl),
+      contentDescription = item.title,
+      modifier = Modifier
+        .size(if (isSelected) 60.dp else 50.dp)
+        .background(
+          color = if (isSelected) colorResource(R.color.darkBrown)
+          else colorResource(R.color.lightBrown),
+          shape = RoundedCornerShape(100.dp)
+        ),
+      contentScale = ContentScale.Inside,
+      colorFilter = if (isSelected) {
+        ColorFilter.tint(Color.White)
+      } else {
+        ColorFilter.tint(Color.Black)
+      }
+    )
+    Spacer(modifier = Modifier.padding(top = 8.dp))
+    Text(
+      text = item.title,
+      color = colorResource(R.color.darkBrown),
+      fontSize = 12.sp,
+      fontWeight = FontWeight.Bold
+    )
+  }
+}
+
+
+@Composable
+fun SectionTitle(title: String, actionText: String) {
+  Row(
+    modifier = Modifier
+      .fillMaxWidth()
+      .padding(top = 24.dp)
+      .padding(horizontal = 16.dp),
+    horizontalArrangement = Arrangement.SpaceBetween
+  ) {
+    Text(
+      text = title,
+      color = Color.Black,
+      fontSize = 18.sp,
+      fontWeight = FontWeight.Bold
+    )
+    Text(
+      text = actionText,
+      color = colorResource(R.color.darkBrown)
+    )
+    
   }
   
 }
@@ -181,14 +314,15 @@ fun AutoSlidingCarousel(
           .padding(top = 16.dp, bottom = 8.dp)
           .height(150.dp)
       )
+      
     }
     DotIndicator(
-        modifier = Modifier
-          .padding(horizontal = 8.dp)
-          .align(Alignment.CenterHorizontally),
-    totalDots = banners.size,
-    selectedIndex = if (isDragged) pagerState.currentPage else pagerState.currentPage,
-    dotSize = 8.dp
+      modifier = Modifier
+        .padding(horizontal = 8.dp)
+        .align(Alignment.CenterHorizontally),
+      totalDots = banners.size,
+      selectedIndex = if (isDragged) pagerState.currentPage else pagerState.currentPage,
+      dotSize = 8.dp
     )
   }
 }
