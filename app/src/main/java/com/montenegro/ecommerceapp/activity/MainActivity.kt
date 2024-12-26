@@ -27,6 +27,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -41,6 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
@@ -68,14 +70,14 @@ class MainActivity : BaseActivity() {
     super.onCreate(savedInstanceState)
     enableEdgeToEdge()
     setContent {
-      MainActivityScreen()
+      MainActivityScreen {}
     }
   }
 }
 
 
 @Composable
-fun MainActivityScreen() {
+fun MainActivityScreen(onCartClick:()->Unit) {
   
   val viewModel = MainViewModel()
   
@@ -231,8 +233,15 @@ fun MainActivityScreen() {
       }
       
     }
+    BottomMenu(
+      modifier = Modifier
+        .fillMaxWidth()
+        .constrainAs(bottomMenu) {
+          bottom.linkTo(parent.bottom)
+        },
+      onItemClick = onCartClick
+    )
   }
-  
 }
 
 @Composable
@@ -399,11 +408,63 @@ fun IndicatorDot(
   )
 }
 
-@Preview(showBackground = true, showSystemUi = true, device = "spec:width=411dp,height=891dp,dpi=420")
 @Composable
-fun PreviewMainActivityScreen() {
-  MainActivityScreen()
+fun BottomMenu(modifier: Modifier, onItemClick: () -> Unit) {
+  Row(
+    modifier = modifier
+      .padding(start = 16.dp, end = 16.dp, bottom = 32.dp)
+      .background(
+        colorResource(R.color.darkBrown),
+        shape = RoundedCornerShape(10.dp)
+      ),
+    horizontalArrangement = Arrangement.SpaceAround
+  ) {
+    BottomMenuItem(icon = painterResource(R.drawable.btn_1), text = "Explore")
+    BottomMenuItem(icon = painterResource(R.drawable.btn_2), text = "Cart",onItemClick=onItemClick)
+    BottomMenuItem(icon = painterResource(R.drawable.btn_3), text = "Favorite")
+    BottomMenuItem(icon = painterResource(R.drawable.btn_4), text = "Orders")
+    BottomMenuItem(icon = painterResource(R.drawable.btn_5), text = "Profile")
+  }
 }
+
+@Composable
+fun BottomMenuItem(icon: Painter, text: String, onItemClick: (() -> Unit)? = null) {
+  Column(modifier = Modifier
+    .height(70.dp)
+    .clickable { onItemClick?.invoke() }
+    .padding(8.dp),
+    horizontalAlignment = Alignment.CenterHorizontally,
+    verticalArrangement = Arrangement.Center
+  ) {
+    Icon(icon, contentDescription = text, tint = Color.White)
+    Spacer(modifier = Modifier.padding(vertical = 4.dp))
+    Text(text, color = Color.White, fontSize = 10.sp)
+  }
+  
+  
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
