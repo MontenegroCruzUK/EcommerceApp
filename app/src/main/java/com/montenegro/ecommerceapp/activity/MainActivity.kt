@@ -1,5 +1,6 @@
 package com.montenegro.ecommerceapp.activity
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -48,11 +49,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.core.content.ContextCompat.startActivity
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -61,7 +62,6 @@ import com.google.accompanist.pager.PagerState
 import com.montenegro.ecommerceapp.R
 import com.montenegro.ecommerceapp.model.CategoryModel
 import com.montenegro.ecommerceapp.model.ItemsModel
-import com.montenegro.ecommerceapp.model.ListItems
 import com.montenegro.ecommerceapp.model.SliderModel
 import com.montenegro.ecommerceapp.viewmodel.MainViewModel
 
@@ -77,7 +77,7 @@ class MainActivity : BaseActivity() {
 
 
 @Composable
-fun MainActivityScreen(onCartClick:()->Unit) {
+fun MainActivityScreen(onCartClick: () -> Unit) {
   
   val viewModel = MainViewModel()
   
@@ -259,7 +259,11 @@ fun CategoryList(categories: SnapshotStateList<CategoryModel>) {
         onItemClick = {
           selectedIndex = index
           Handler(Looper.getMainLooper()).postDelayed({
-          
+            val intent = Intent(contex, ListItemsActivity::class.java).apply {
+              putExtra("id", categories[index].id.toString())
+              putExtra("title", categories[index].title)
+            }
+            startActivity(contex, intent, null)
           }, 500)
         }
       )
@@ -420,7 +424,7 @@ fun BottomMenu(modifier: Modifier, onItemClick: () -> Unit) {
     horizontalArrangement = Arrangement.SpaceAround
   ) {
     BottomMenuItem(icon = painterResource(R.drawable.btn_1), text = "Explore")
-    BottomMenuItem(icon = painterResource(R.drawable.btn_2), text = "Cart",onItemClick=onItemClick)
+    BottomMenuItem(icon = painterResource(R.drawable.btn_2), text = "Cart", onItemClick = onItemClick)
     BottomMenuItem(icon = painterResource(R.drawable.btn_3), text = "Favorite")
     BottomMenuItem(icon = painterResource(R.drawable.btn_4), text = "Orders")
     BottomMenuItem(icon = painterResource(R.drawable.btn_5), text = "Profile")
