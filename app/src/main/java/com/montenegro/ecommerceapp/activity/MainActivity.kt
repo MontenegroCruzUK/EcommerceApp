@@ -58,6 +58,8 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
 import com.montenegro.ecommerceapp.R
 import com.montenegro.ecommerceapp.model.CategoryModel
+import com.montenegro.ecommerceapp.model.ItemsModel
+import com.montenegro.ecommerceapp.model.ListItems
 import com.montenegro.ecommerceapp.model.SliderModel
 import com.montenegro.ecommerceapp.viewmodel.MainViewModel
 
@@ -83,6 +85,9 @@ fun MainActivityScreen() {
   val categories = remember { mutableStateListOf<CategoryModel>() }
   var showCategoriesLoading by remember { mutableStateOf(true) }
   
+  val popular = remember { mutableStateListOf<ItemsModel>() }
+  var showPopularLoading by remember { mutableStateOf(true) }
+  
   //Banner
   LaunchedEffect(Unit) {
     viewModel.loadBanner().observeForever {
@@ -98,6 +103,15 @@ fun MainActivityScreen() {
       categories.clear()
       categories.addAll(it)
       showCategoriesLoading = false
+    }
+  }
+  
+  //Popular
+  LaunchedEffect(Unit) {
+    viewModel.loadPopular().observeForever {
+      popular.clear()
+      popular.addAll(it)
+      showPopularLoading = false
     }
   }
   
@@ -195,6 +209,24 @@ fun MainActivityScreen() {
         } else {
           //SectionTitle("Most Popular","See All")
           CategoryList(categories)
+        }
+      }
+      //Popular
+      item {
+        SectionTitle("Most Popular", "See All")
+      }
+      item {
+        if (showPopularLoading) {
+          Box(
+            modifier = Modifier
+              .fillMaxWidth()
+              .height(200.dp),
+            contentAlignment = Alignment.Center
+          ) {
+            CircularProgressIndicator()
+          }
+        } else {
+          ListItems(popular)
         }
       }
       
