@@ -65,6 +65,8 @@ dependencies {
   implementation(libs.androidx.activity)
   implementation(libs.firebase.database.ktx)
   implementation(libs.firebase.database)
+  implementation(libs.androidx.foundation.android)
+  implementation(libs.androidx.foundation.android)
   
   testImplementation(libs.junit)
   androidTestImplementation(libs.androidx.junit)
