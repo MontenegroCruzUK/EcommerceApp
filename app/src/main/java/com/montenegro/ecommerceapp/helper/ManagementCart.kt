@@ -5,7 +5,7 @@ import android.widget.Toast
 import com.example.project1762.Helper.ChangeNumberItemsListener
 import com.montenegro.ecommerceapp.model.ItemsModel
 
-class ManagmentCart(val context: Context) {
+class ManagementCart(val context: Context) {
   
   private val tinyDB = TinyDB(context)
   

@@ -1,5 +1,6 @@
 package com.montenegro.ecommerceapp.activity
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -44,28 +45,28 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import coil.compose.rememberAsyncImagePainter
 import com.montenegro.ecommerceapp.R
-import com.montenegro.ecommerceapp.helper.ManagmentCart
+import com.montenegro.ecommerceapp.helper.ManagementCart
 import com.montenegro.ecommerceapp.model.ItemsModel
 
 class DetailActivity : BaseActivity() {
   private lateinit var item: ItemsModel
-  private lateinit var managmentCart: ManagmentCart
+  private lateinit var managementCart: ManagementCart
   
   
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     item = intent.getSerializableExtra("object") as ItemsModel
-    managmentCart = ManagmentCart(this)
+    managementCart = ManagementCart(this)
     setContent {
       DetailScreen(
         item = item,
         onBackClick = { finish() },
         onAddToCartClick = {
           item.numberInCart = 1
-          managmentCart.insertItem(item)
+          managementCart.insertItem(item)
         },
         onCartClick = {
-        
+          startActivity(Intent(this, CartActivity::class.java))
         }
       
       )

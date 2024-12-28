@@ -70,7 +70,9 @@ class MainActivity : BaseActivity() {
     super.onCreate(savedInstanceState)
     enableEdgeToEdge()
     setContent {
-      MainActivityScreen {}
+      MainActivityScreen {
+        startActivity(Intent(this, CartActivity::class.java))
+      }
     }
   }
 }
